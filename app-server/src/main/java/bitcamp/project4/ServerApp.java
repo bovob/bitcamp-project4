@@ -1,6 +1,7 @@
 package bitcamp.project4;
 
 import bitcamp.project4.context.ApplicationContext;
+import bitcamp.project4.dao.skel.QuizDaoSkel;
 import bitcamp.project4.dao.skel.UserDaoSkel;
 import bitcamp.project4.listener.ApplicationListener;
 import bitcamp.project4.listener.InitApplicationListener;
@@ -18,6 +19,7 @@ public class ServerApp {
   ApplicationContext appCtx = new ApplicationContext();
 
   UserDaoSkel userDaoSkel;
+  QuizDaoSkel quizDaoSkel;
 
   public static void main(String[] args) {
     ServerApp app = new ServerApp();
@@ -49,6 +51,7 @@ public class ServerApp {
 
     // 서버에서 사용할 Dao Skeloton 객체를 준비한다.
     userDaoSkel = (UserDaoSkel) appCtx.getAttribute("userDaoSkel");
+    quizDaoSkel = (QuizDaoSkel) appCtx.getAttribute("quizDaoSkel");
 
     System.out.println("서버 프로젝트 관리 시스템 시작!");
 
@@ -96,6 +99,9 @@ public class ServerApp {
       switch (dataName) {
         case "users":
           userDaoSkel.service(in, out);
+          break;
+        case "quiz":
+          quizDaoSkel.service(in, out);
           break;
         default:
       }
