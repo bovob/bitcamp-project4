@@ -16,6 +16,9 @@ repositories {
 }
 
 dependencies {
+    implementation project(':app-common')
+
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 
@@ -35,7 +38,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'bitcamp.project4.App'
+    mainClass = 'bitcamp.project4.ServerApp'
 }
 
 tasks.named('test') {
