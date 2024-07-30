@@ -1,4 +1,4 @@
-package project4;
+package bitcamp.project4;
 
 public class App {
 
