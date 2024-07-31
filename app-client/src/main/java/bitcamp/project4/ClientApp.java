@@ -4,6 +4,9 @@ import bitcamp.project4.context.ApplicationContext;
 import bitcamp.project4.listener.ApplicationListener;
 import bitcamp.project4.listener.InitApplicationListener;
 import bitcamp.project4.util.Prompt;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +48,19 @@ public class ClientApp {
         }
       }
 
-      System.out.println("[프로젝트 관리 시스템]");
+      while (true) {
+        String command = Prompt.input("1)게임시작 2)종료 > ");
+        if (command.equals("1")) {
+          playHangman();
+        } else if (command.equals("2")) {
+          break;
+        }
+      }
 
-      appCtx.getMainMenu().execute();
+
+      //System.out.println("[프로젝트 관리 시스템]");
+      //
+      //appCtx.getMainMenu().execute();
 
     } catch (Exception ex) {
       System.out.println("실행 오류!");
@@ -65,6 +78,51 @@ public class ClientApp {
       } catch (Exception e) {
         System.out.println("리스너 실행 중 오류 발생!");
       }
+    }
+  }
+
+  private void playHangman() {
+    try (
+        Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+    ) {
+      out.writeUTF("hangman");
+      out.flush();
+
+      int wordLength = (int) in.readObject();
+      int turnsLeft = in.readInt();
+      System.out.println("단어 길이: " + wordLength);
+      System.out.println("남은 턴 수: " + turnsLeft);
+
+      while (true) {
+        System.out.print("알파벳을 입력하세요: ");
+        char guess = Prompt.input("").toLowerCase().charAt(0);
+        out.writeChar(guess);
+        out.flush();
+
+        boolean correctGuess = in.readBoolean();
+        turnsLeft = in.readInt();
+        String displayWord = (String) in.readObject();
+        boolean gameOver = in.readBoolean();
+
+        System.out.println(correctGuess ? "정답!" : "오답!");
+        System.out.println("현재 상태: " + displayWord);
+        System.out.println("남은 턴 수: " + turnsLeft);
+
+        if (gameOver) {
+          String answer = (String) in.readObject();
+          boolean isWin = in.readBoolean();
+          if (isWin) {
+            System.out.println("축하합니다! 정답을 맞추셨습니다: " + answer);
+          } else {
+            System.out.println("게임 오버! 정답은 '" + answer + "' 였습니다.");
+          }
+          break;
+        }
+      }
+    } catch (Exception e) {
+      System.out.println("게임 진행 중 오류 발생: " + e.getMessage());
     }
   }
 }
