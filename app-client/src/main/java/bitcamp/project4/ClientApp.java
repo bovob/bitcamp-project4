@@ -48,6 +48,11 @@ public class ClientApp {
         }
       }
 
+      // 게임 시작 메뉴 전에 환영 메시지 출력
+      System.out.println("---------------------------------");
+      System.out.println("[Welcome to Hang Man Game! \uD83C\uDFAE]");
+      System.out.println("---------------------------------");
+
       while (true) {
         String command = Prompt.input("1)게임시작 2)종료 > ");
         if (command.equals("1")) {
@@ -56,11 +61,6 @@ public class ClientApp {
           break;
         }
       }
-
-
-      //System.out.println("[프로젝트 관리 시스템]");
-      //
-      //appCtx.getMainMenu().execute();
 
     } catch (Exception ex) {
       System.out.println("실행 오류!");
@@ -83,9 +83,9 @@ public class ClientApp {
 
   private void playHangman() {
     try (
-        Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+            Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
     ) {
       out.writeUTF("hangman");
       out.flush();
@@ -96,12 +96,21 @@ public class ClientApp {
       System.out.println("남은 턴 수: " + turnsLeft);
 
       while (true) {
+        // 매 턴 시작 시 타이틀과 구분선을 출력
+        System.out.println("---------------------------------");
+        System.out.println("Hang Man Game 🎮");
+        System.out.println("---------------------------------");
+
         System.out.print("알파벳을 입력하세요: ");
         char guess = Prompt.input("").toLowerCase().charAt(0);
         out.writeChar(guess);
         out.flush();
 
         boolean correctGuess = in.readBoolean();
+        if (!correctGuess) {
+          turnsLeft--;  // 오답일 경우 남은 턴 수를 감소시킴
+        }
+
         turnsLeft = in.readInt();
         String displayWord = (String) in.readObject();
         boolean gameOver = in.readBoolean();
@@ -114,9 +123,9 @@ public class ClientApp {
           String answer = (String) in.readObject();
           boolean isWin = in.readBoolean();
           if (isWin) {
-            System.out.println("축하합니다! 정답을 맞추셨습니다: " + answer);
+            System.out.println("축하합니다! \uD83D\uDE18 정답을 맞추셨습니다: " + answer);
           } else {
-            System.out.println("게임 오버! 정답은 '" + answer + "' 였습니다.");
+            System.out.println("게임 오버! \uD83D\uDE35\u200D\uD83D\uDCAB 정답은 '" + answer + "' 였습니다.");
           }
           break;
         }
