@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class ApplicationContext {
 
-  MenuGroup mainMenu = new MenuGroup("메인");
+  MenuGroup mainMenu = new MenuGroup("행 거 맨");
 
   Map<String, Object> objContainer = new HashMap<>();
 

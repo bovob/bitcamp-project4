@@ -1,4 +1,3 @@
-// Hangman.java
 package bitcamp.project4;
 
 import bitcamp.project4.dao.ListQuizDao;
@@ -34,12 +33,24 @@ public class Hangman {
     }
 
     public boolean processGuess(char guess) {
+        // 입력된 문자가 알파벳인지 확인합니다.
+        if (!Character.isLetter(guess)) {
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요!");
+            return false;  // 잘못된 입력이므로 턴 수를 깎지 않습니다.
+        }
+
+        // 이미 추측한 문자인지 확인합니다.
+        if (guessedLetters.contains(guess)) {
+            System.out.println("이미 추측한 문자입니다. 다른 문자를 입력해주세요.");
+            return false;  // 이미 추측한 문자이므로 턴 수를 깎지 않습니다.
+        }
+
         guessedLetters.add(guess);
-        if (currentQuiz.getAnswer().indexOf(guess) == -1) {
+        if (currentQuiz.getAnswer().toLowerCase().indexOf(Character.toLowerCase(guess)) == -1) {
             turnsLeft--;
-            return false;
+            return false;  // 추측이 틀린 경우
         } else {
-            return true;
+            return true;  // 추측이 맞은 경우
         }
     }
 
@@ -57,11 +68,11 @@ public class Hangman {
     }
 
     public boolean isGameOver() {
-        return turnsLeft == 0 || getDisplayWord().replace(" ", "").equals(currentQuiz.getAnswer());
+        return turnsLeft == 0 || getDisplayWord().replace(" ", "").equalsIgnoreCase(currentQuiz.getAnswer());
     }
 
     public boolean isWin() {
-        return getDisplayWord().replace(" ", "").equals(currentQuiz.getAnswer());
+        return getDisplayWord().replace(" ", "").equalsIgnoreCase(currentQuiz.getAnswer());
     }
 
     public Quiz getCurrentQuiz() {
