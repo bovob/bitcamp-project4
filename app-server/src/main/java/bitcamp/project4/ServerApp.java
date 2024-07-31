@@ -2,7 +2,6 @@ package bitcamp.project4;
 
 import bitcamp.project4.context.ApplicationContext;
 import bitcamp.project4.dao.skel.QuizDaoSkel;
-import bitcamp.project4.dao.skel.UserDaoSkel;
 import bitcamp.project4.listener.ApplicationListener;
 import bitcamp.project4.listener.InitApplicationListener;
 import java.io.ObjectInputStream;
