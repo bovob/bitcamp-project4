@@ -10,6 +10,8 @@ public class Quiz implements Serializable {
   private int no;
   private int number;
   private String answer;
+  private String topic;
+  private String hint;
 
   public Quiz() {
   }
@@ -57,4 +59,22 @@ public class Quiz implements Serializable {
   public void setAnswer(String answer) {
     this.answer = answer;
   }
+
+  public String getTopic() {
+    return topic;
+  }
+
+  public void setTopic(String topic) {
+    this.topic = topic;
+  }
+
+  public String getHint() {
+    return hint;
+  }
+
+  public void setHint(String hint) {
+    this.hint = hint;
+  }
+
+
 }

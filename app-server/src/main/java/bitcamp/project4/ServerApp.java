@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import org.checkerframework.checker.units.qual.A;
 
 public class ServerApp {
 
@@ -47,9 +46,9 @@ public class ServerApp {
       } catch (Exception e) {
         System.out.println("리스너 실행 중 오류 발생!");
       }
-
-      hangman = new Hangman("data.xlsx");
     }
+
+    hangman = new Hangman("data.xlsx");
 
     // 서버에서 사용할 Dao Skeloton 객체를 준비한다.
     quizDaoSkel = (QuizDaoSkel) appCtx.getAttribute("quizDaoSkel");
@@ -79,7 +78,6 @@ public class ServerApp {
       }
     }
   }
-
 
   void processRequest(Socket s) {
 
@@ -117,6 +115,7 @@ public class ServerApp {
 
     out.writeObject(hangman.getCurrentQuiz().getNumber()); // 글자 수 전송
     out.writeInt(hangman.getTurnsLeft()); // 초기 턴 수 전송
+    out.writeObject(hangman.getTopic()); // 주제 전송
     out.flush();
 
     while (!hangman.isGameOver()) {
@@ -127,6 +126,10 @@ public class ServerApp {
       out.writeInt(hangman.getTurnsLeft());
       out.writeObject(hangman.getDisplayWord());
       out.writeBoolean(hangman.isGameOver());
+      out.writeBoolean(hangman.shouldShowHint());
+      if (hangman.shouldShowHint()) {
+        out.writeObject(hangman.getHint());
+      }
       out.flush();
     }
 

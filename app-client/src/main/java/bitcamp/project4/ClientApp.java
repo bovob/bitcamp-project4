@@ -57,11 +57,6 @@ public class ClientApp {
         }
       }
 
-
-      //System.out.println("[프로젝트 관리 시스템]");
-      //
-      //appCtx.getMainMenu().execute();
-
     } catch (Exception ex) {
       System.out.println("실행 오류!");
       ex.printStackTrace();
@@ -92,8 +87,10 @@ public class ClientApp {
 
       int wordLength = (int) in.readObject();
       int turnsLeft = in.readInt();
+      String topic = (String) in.readObject();
       System.out.println("단어 길이: " + wordLength);
       System.out.println("남은 턴 수: " + turnsLeft);
+      System.out.println("주제: " + topic);
 
       while (true) {
         System.out.print("알파벳을 입력하세요: ");
@@ -105,10 +102,16 @@ public class ClientApp {
         turnsLeft = in.readInt();
         String displayWord = (String) in.readObject();
         boolean gameOver = in.readBoolean();
+        boolean showHint = in.readBoolean();
 
         System.out.println(correctGuess ? "정답!" : "오답!");
         System.out.println("현재 상태: " + displayWord);
         System.out.println("남은 턴 수: " + turnsLeft);
+
+        if (showHint) {
+          String hint = (String) in.readObject();
+          System.out.println("힌트: " + hint);
+        }
 
         if (gameOver) {
           String answer = (String) in.readObject();

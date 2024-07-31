@@ -6,10 +6,14 @@ import bitcamp.project4.myapp.vo.Quiz;
 import java.util.*;
 
 public class Hangman {
+    private static final int MAX_TRIES = 6;
     private ListQuizDao quizDao;
     private Quiz currentQuiz;
     private Set<Character> guessedLetters;
     private int turnsLeft;
+    private String topic;
+    private String hint;
+    private int wrongGuesses;
 
     public Hangman(String excelFilePath) {
         quizDao = new ListQuizDao(excelFilePath);
@@ -30,6 +34,9 @@ public class Hangman {
         }
         guessedLetters.clear();
         turnsLeft = currentQuiz.getAnswer().length() + 4;
+        topic = currentQuiz.getTopic();
+        hint = currentQuiz.getHint();
+        wrongGuesses = 0;
     }
 
     public boolean processGuess(char guess) {
@@ -48,6 +55,7 @@ public class Hangman {
         guessedLetters.add(guess);
         if (currentQuiz.getAnswer().toLowerCase().indexOf(Character.toLowerCase(guess)) == -1) {
             turnsLeft--;
+            wrongGuesses++;
             return false;  // 추측이 틀린 경우
         } else {
             return true;  // 추측이 맞은 경우
@@ -81,5 +89,17 @@ public class Hangman {
 
     public int getTurnsLeft() {
         return turnsLeft;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public boolean shouldShowHint() {
+        return wrongGuesses >= 3;
     }
 }
