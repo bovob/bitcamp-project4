@@ -35,6 +35,8 @@ public class ListQuizDao implements QuizDao {
           quiz.setNo(getIntValue(row.getCell(0)));
           quiz.setNumber(getIntValue(row.getCell(1)));
           quiz.setAnswer(getStringValue(row.getCell(2)));
+          quiz.setTopic(getStringValue(row.getCell(3)));
+          quiz.setHint(getStringValue(row.getCell(4)));
           quizList.add(quiz);
         } catch (Exception e) {
           System.out.printf("%d 번의 데이터 형식이 맞지 않습니다.\n", i);
@@ -88,6 +90,8 @@ public class ListQuizDao implements QuizDao {
         dataRow.createCell(0).setCellValue(quiz.getNo());
         dataRow.createCell(1).setCellValue(quiz.getNumber());
         dataRow.createCell(2).setCellValue(quiz.getAnswer());
+        dataRow.createCell(3).setCellValue(quiz.getTopic());
+        dataRow.createCell(4).setCellValue(quiz.getHint());
       }
 
       // 엑셀 파일로 데이터를 출력하기 전에
