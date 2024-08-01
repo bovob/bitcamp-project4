@@ -3,11 +3,6 @@ package bitcamp.project4;
 import bitcamp.project4.dao.ListQuizDao;
 import bitcamp.project4.myapp.vo.Quiz;
 
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import com.googlecode.lanterna.terminal.Terminal;
-import java.io.IOException;
 import java.util.*;
 
 public class Hangman {
@@ -19,19 +14,10 @@ public class Hangman {
     private String topic;
     private String hint;
     private int wrongGuesses;
-    private Screen screen;
 
     public Hangman(String excelFilePath) {
         quizDao = new ListQuizDao(excelFilePath);
         guessedLetters = new HashSet<>();
-        try {
-            Terminal terminal = new DefaultTerminalFactory().createTerminal();
-            screen = new TerminalScreen(terminal);
-            screen.startScreen();
-        } catch (IOException e) {
-            System.out.println("터미널 생성 중 오류 발생: " + e.getMessage());
-            System.exit(1);
-        }
     }
 
     public void startNewGame() {
