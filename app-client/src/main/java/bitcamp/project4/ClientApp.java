@@ -85,7 +85,7 @@ public class ClientApp {
     }
   }
 
-  private void playHangman()  {
+  private void playHangman() {
     try (
         Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -97,42 +97,37 @@ public class ClientApp {
       int wordLength = (int) in.readObject();
       int turnsLeft = in.readInt();
       String topic = (String) in.readObject();
-      System.out.println("단어 길이: " + wordLength);
-      System.out.println("남은 턴 수: " + turnsLeft);
+      String gameState = (String) in.readObject();
+
+      System.out.println("행맨 게임을 시작합니다!");
       System.out.println("주제: " + topic);
+      System.out.println("단어 길이: " + wordLength);
+      System.out.println(gameState);
 
       while (true) {
-        System.out.print("알파벳을 입력하세요: ");
+        System.out.print("글자를 추측하세요: ");
         char guess = Prompt.input("").toLowerCase().charAt(0);
         out.writeChar(guess);
         out.flush();
 
         boolean correctGuess = in.readBoolean();
-        if (!correctGuess) {
-          turnsLeft--;  // 오답일 경우 남은 턴 수를 감소시킴
-        }
         turnsLeft = in.readInt();
-        String displayWord = (String) in.readObject();
+        String currentWord = (String) in.readObject();
         boolean gameOver = in.readBoolean();
-        boolean showHint = in.readBoolean();
+        gameState = (String) in.readObject();
 
-        System.out.println(correctGuess ? "정답!" : "오답!");
-        System.out.println("현재 상태: " + displayWord);
-        System.out.println("남은 턴 수: " + turnsLeft);
-
-        if (showHint) {
-          String hint = (String) in.readObject();
-          System.out.println("힌트: " + hint);
-        }
+        System.out.println(gameState);
 
         if (gameOver) {
           String answer = (String) in.readObject();
-          boolean isWin = in.readBoolean();
-          if (isWin) {
-            System.out.println("축하합니다! \uD83D\uDE18 정답을 맞추셨습니다: " + answer);
+          boolean win = in.readBoolean();
+
+          if (win) {
+            System.out.println("축하합니다! 정답을 맞추셨습니다.");
           } else {
-            System.out.println("게임 오버! \uD83D\uDE35\u200D\uD83D\uDCAB 정답은 '" + answer + "' 였습니다.");
+            System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
           }
+          System.out.println("정답은 '" + answer + "' 였습니다.");
           break;
         }
       }

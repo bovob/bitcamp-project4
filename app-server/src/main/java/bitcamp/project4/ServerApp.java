@@ -110,16 +110,18 @@ public class ServerApp {
       }
     } catch (Exception e) {
       System.out.printf("%s:%d 클라이언트 요청 처리 중 오류 발생!\n", remoteHost, port);
+      e.printStackTrace();
     }
   }
 
-  private void playHangman (ObjectInputStream in, ObjectOutputStream out) throws Exception{
+  private void playHangman(ObjectInputStream in, ObjectOutputStream out) throws Exception {
     Hangman hangman = new Hangman("data.xlsx");
     hangman.startNewGame();
 
     out.writeObject(hangman.getCurrentQuiz().getNumber()); // 글자 수 전송
     out.writeInt(hangman.getTurnsLeft()); // 초기 턴 수 전송
     out.writeObject(hangman.getTopic()); // 주제 전송
+    out.writeObject(hangman.getGameState()); // 초기 게임 상태 전송
     out.flush();
 
     while (!hangman.isGameOver()) {
@@ -130,10 +132,7 @@ public class ServerApp {
       out.writeInt(hangman.getTurnsLeft());
       out.writeObject(hangman.getDisplayWord());
       out.writeBoolean(hangman.isGameOver());
-      out.writeBoolean(hangman.shouldShowHint());
-      if (hangman.shouldShowHint()) {
-        out.writeObject(hangman.getHint());
-      }
+      out.writeObject(hangman.getGameState()); // 현재 게임 상태 전송
       out.flush();
     }
 

@@ -3,6 +3,11 @@ package bitcamp.project4;
 import bitcamp.project4.dao.ListQuizDao;
 import bitcamp.project4.myapp.vo.Quiz;
 
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
+import java.io.IOException;
 import java.util.*;
 
 public class Hangman {
@@ -14,10 +19,19 @@ public class Hangman {
     private String topic;
     private String hint;
     private int wrongGuesses;
+    private Screen screen;
 
     public Hangman(String excelFilePath) {
         quizDao = new ListQuizDao(excelFilePath);
         guessedLetters = new HashSet<>();
+        try {
+            Terminal terminal = new DefaultTerminalFactory().createTerminal();
+            screen = new TerminalScreen(terminal);
+            screen.startScreen();
+        } catch (IOException e) {
+            System.out.println("터미널 생성 중 오류 발생: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     public void startNewGame() {
@@ -33,32 +47,29 @@ public class Hangman {
             System.exit(1);
         }
         guessedLetters.clear();
-        turnsLeft = currentQuiz.getAnswer().length() + 4;
+        turnsLeft = MAX_TRIES;
         topic = currentQuiz.getTopic();
         hint = currentQuiz.getHint();
         wrongGuesses = 0;
     }
 
     public boolean processGuess(char guess) {
-        // 입력된 문자가 알파벳인지 확인합니다.
         if (!Character.isLetter(guess)) {
-            System.out.println("잘못된 입력입니다. 다시 입력해주세요!");
-            return false;  // 잘못된 입력이므로 턴 수를 깎지 않습니다.
+            return false;
         }
 
-        // 이미 추측한 문자인지 확인합니다.
+        guess = Character.toLowerCase(guess);
         if (guessedLetters.contains(guess)) {
-            System.out.println("이미 추측한 문자입니다. 다른 문자를 입력해주세요.");
-            return false;  // 이미 추측한 문자이므로 턴 수를 깎지 않습니다.
+            return false;
         }
 
         guessedLetters.add(guess);
-        if (currentQuiz.getAnswer().toLowerCase().indexOf(Character.toLowerCase(guess)) == -1) {
+        if (currentQuiz.getAnswer().toLowerCase().indexOf(guess) == -1) {
             turnsLeft--;
             wrongGuesses++;
-            return false;  // 추측이 틀린 경우
+            return false;
         } else {
-            return true;  // 추측이 맞은 경우
+            return true;
         }
     }
 
@@ -101,5 +112,31 @@ public class Hangman {
 
     public boolean shouldShowHint() {
         return wrongGuesses >= 3;
+    }
+
+    public String getHangmanImage() {
+        String[] hangmanStages = {
+            "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
+        };
+
+        return hangmanStages[wrongGuesses];
+    }
+
+    public String getGameState() {
+        StringBuilder state = new StringBuilder();
+        state.append(getHangmanImage()).append("\n\n");
+        state.append("Word: ").append(getDisplayWord()).append("\n");
+        state.append("Turns left: ").append(turnsLeft).append("\n");
+        state.append("Topic: ").append(topic).append("\n");
+        if (shouldShowHint()) {
+            state.append("Hint: ").append(hint).append("\n");
+        }
+        return state.toString();
     }
 }
