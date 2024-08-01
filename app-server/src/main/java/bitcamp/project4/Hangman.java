@@ -47,20 +47,20 @@ public class Hangman {
         guess = Character.toLowerCase(guess);
         boolean alreadyGuessed = guessedLetters.contains(guess);
 
+        if (alreadyGuessed) {
+            return false;  // 이미 추측한 글자는 false를 반환
+        }
+
         guessedLetters.add(guess);
 
         if (currentQuiz.getAnswer().toLowerCase().indexOf(guess) == -1) {
-            if (!alreadyGuessed) {
-                // 첫 추측이라면 틀린 경우에만 턴 수를 줄인다.
-                wrongGuesses++;
-            }
-            turnsLeft--; // 이미 틀린 단어를 중복 입력해도 턴 수를 깎는다.
+            wrongGuesses++;
+            turnsLeft--;
             return false;
         } else {
             return true;
         }
     }
-
 
     public String getDisplayWord() {
         StringBuilder display = new StringBuilder();
@@ -114,7 +114,7 @@ public class Hangman {
             "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
         };
 
-        return hangmanStages[wrongGuesses];
+        return hangmanStages[Math.min(wrongGuesses, MAX_TRIES)];
     }
 
     public String getGameState() {
@@ -123,6 +123,7 @@ public class Hangman {
         state.append("Word: ").append(getDisplayWord()).append("\n");
         state.append("Turns left: ").append(turnsLeft).append("\n");
         state.append("Topic: ").append(topic).append("\n");
+        state.append("Guessed letters: ").append(String.join(", ", guessedLetters.stream().map(String::valueOf).sorted().toList())).append("\n");
         if (shouldShowHint()) {
             state.append("Hint: ").append(hint).append("\n");
         }
