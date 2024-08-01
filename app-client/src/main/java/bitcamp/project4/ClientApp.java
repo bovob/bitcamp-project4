@@ -14,13 +14,14 @@ public class ClientApp {
 
   List<ApplicationListener> listeners = new ArrayList<>();
   ApplicationContext appCtx = new ApplicationContext();
+  private Socket socket;
+  private ObjectOutputStream out;
+  private ObjectInputStream in;
 
   public static void main(String[] args) {
     ClientApp app = new ClientApp();
-
     // 애플리케이션이 시작되거나 종료될 때 알림 받을 객체의 연락처를 등록한다.
     app.addApplicationListener(new InitApplicationListener());
-
     app.execute();
   }
 
@@ -38,6 +39,11 @@ public class ClientApp {
       System.out.println("Default [ localhost / 8888 ]");
       appCtx.setAttribute("host", Prompt.input("서버 주소?"));
       appCtx.setAttribute("port", Prompt.inputInt("포트 번호?"));
+      // 클라이언트 소켓 생성
+      socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
+
+      out = new ObjectOutputStream(socket.getOutputStream());
+      in = new ObjectInputStream(socket.getInputStream());
 
       // 애플리케이션이 시작될 때 리스너에게 알린다.
       for (ApplicationListener listener : listeners) {
@@ -61,6 +67,7 @@ public class ClientApp {
         String command = Prompt.input("1)게임시작 2)종료 > ");
         if (command.equals("1")) {
           playHangman();
+
         } else if (command.equals("2")) {
           break;
         }
@@ -69,6 +76,8 @@ public class ClientApp {
     } catch (Exception ex) {
       System.out.println("실행 오류!");
       ex.printStackTrace();
+    } finally {
+      closeConnection();
     }
 
     System.out.println("종료합니다.");
@@ -85,66 +94,67 @@ public class ClientApp {
     }
   }
 
-  private void playHangman() {
-    try (
-            Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
-    ) {
-      out.writeUTF("hangman");
-      out.flush();
+  private void playHangman() throws Exception {
+    out.writeUTF("hangman");
+    out.flush();
 
-      int wordLength = (int) in.readObject();
-      int turnsLeft = in.readInt();
-      String topic = (String) in.readObject();
-      String gameState = (String) in.readObject();
+    int wordLength = (int) in.readObject();
+    int turnsLeft = in.readInt();
+    String topic = (String) in.readObject();
+    String gameState = (String) in.readObject();
 
-      System.out.println("행맨 게임을 시작합니다!");
-      System.out.println("주제: " + topic);
-      System.out.println("단어 길이: " + wordLength);
-      System.out.println(gameState);
+    System.out.println("행맨 게임을 시작합니다!");
+    System.out.println("주제: " + topic);
+    System.out.println("단어 길이: " + wordLength);
+    System.out.println(gameState);
 
+    while (true) {
+      char guess;
       while (true) {
-        char guess;
-        while (true) {
-          System.out.print("글자를 추측하세요: ");
-          String input = Prompt.input("").trim().toLowerCase();
+        System.out.print("글자를 추측하세요: ");
+        String input = Prompt.input("").trim().toLowerCase();
 
-          if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
-            guess = input.charAt(0);
-            break;
-          } else {
-            System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
-          }
-        }
-
-        out.writeChar(guess);
-        out.flush();
-
-        boolean correctGuess = in.readBoolean();
-        turnsLeft = in.readInt();
-        String currentWord = (String) in.readObject();
-        boolean gameOver = in.readBoolean();
-        gameState = (String) in.readObject();
-
-        System.out.println(gameState);
-
-        if (gameOver) {
-          String answer = (String) in.readObject();
-          boolean win = in.readBoolean();
-
-          if (win) {
-            System.out.println("축하합니다! 정답을 맞추셨습니다.");
-          } else {
-            System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
-          }
-          System.out.println("정답은 '" + answer + "' 였습니다.");
+        if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
+          guess = input.charAt(0);
           break;
+        } else {
+          System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
         }
       }
-    } catch (Exception e) {
-      System.out.println("게임 진행 중 오류 발생: " + e.getMessage());
+
+      out.writeChar(guess);
+      out.flush();
+
+      boolean correctGuess = in.readBoolean();
+      turnsLeft = in.readInt();
+      String currentWord = (String) in.readObject();
+      boolean gameOver = in.readBoolean();
+      gameState = (String) in.readObject();
+
+      System.out.println(gameState);
+
+      if (gameOver) {
+        String answer = (String) in.readObject();
+        boolean win = in.readBoolean();
+
+        if (win) {
+          System.out.println("축하합니다! 정답을 맞추셨습니다.");
+        } else {
+          System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
+        }
+        System.out.println("정답은 '" + answer + "' 였습니다.");
+        break;
+      }
     }
   }
 
+  private void closeConnection() {
+    try {
+      if (in != null) in.close();
+      if (out != null) out.close();
+      if (socket != null) socket.close();
+    } catch (Exception e) {
+      System.out.println("연결 종료 중 오류 발생: " + e.getMessage());
+    }
+  }
 }

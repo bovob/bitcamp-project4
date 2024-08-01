@@ -18,7 +18,6 @@ public class ServerApp {
 
   List<ApplicationListener> listeners = new ArrayList<>();
   ApplicationContext appCtx = new ApplicationContext();
-
   QuizDaoSkel quizDaoSkel;
   private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -40,6 +39,8 @@ public class ServerApp {
   }
 
   void execute() {
+    String remoteHost = null;
+    int port = 0;
 
     // 애플리케이션이 시작될 때 리스너에게 알린다.
     for (ApplicationListener listener : listeners) {
@@ -60,6 +61,11 @@ public class ServerApp {
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
+        InetSocketAddress addr = (InetSocketAddress) clientSocket.getRemoteSocketAddress();
+        remoteHost = addr.getHostString();
+        port = addr.getPort();
+
+        System.out.printf("%s:%d 클라이언트와 연결되었음!\n", remoteHost, port);
         threadPool.submit(() -> processRequest(clientSocket));
       }
 
@@ -82,6 +88,7 @@ public class ServerApp {
     }
   }
 
+
   void processRequest(Socket s) {
 
     String remoteHost = null;
@@ -93,7 +100,7 @@ public class ServerApp {
       remoteHost = addr.getHostString();
       port = addr.getPort();
 
-      System.out.printf("%s:%d 클라이언트와 연결되었음!\n", remoteHost, port);
+
 
       ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
       ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -109,8 +116,7 @@ public class ServerApp {
         default:
       }
     } catch (Exception e) {
-      System.out.printf("%s:%d 클라이언트 요청 처리 중 오류 발생!\n", remoteHost, port);
-      e.printStackTrace();
+      System.out.printf("%s:%d 클라이언트가 게임을 종료합니다.\n", remoteHost, port);
     }
   }
 
