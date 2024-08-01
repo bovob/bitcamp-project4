@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerApp {
 
@@ -18,7 +20,7 @@ public class ServerApp {
   ApplicationContext appCtx = new ApplicationContext();
 
   QuizDaoSkel quizDaoSkel;
-  private Hangman hangman;
+  private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
   public static void main(String[] args) {
     ServerApp app = new ServerApp();
@@ -48,8 +50,6 @@ public class ServerApp {
       }
     }
 
-    hangman = new Hangman("data.xlsx");
-
     // 서버에서 사용할 Dao Skeloton 객체를 준비한다.
     quizDaoSkel = (QuizDaoSkel) appCtx.getAttribute("quizDaoSkel");
 
@@ -59,12 +59,15 @@ public class ServerApp {
       System.out.println("서버 실행 중...");
 
       while (true) {
-        processRequest(serverSocket.accept());
+        Socket clientSocket = serverSocket.accept();
+        threadPool.submit(() -> processRequest(clientSocket));
       }
 
     } catch (Exception e) {
       System.out.println("통신 중 오류 발생!");
       e.printStackTrace();
+    } finally {
+      threadPool.shutdown();
     }
 
     System.out.println("종료합니다.");
@@ -110,7 +113,8 @@ public class ServerApp {
     }
   }
 
-  private void playHangman(ObjectInputStream in, ObjectOutputStream out) throws Exception {
+  private void playHangman (ObjectInputStream in, ObjectOutputStream out) throws Exception{
+    Hangman hangman = new Hangman("data.xlsx");
     hangman.startNewGame();
 
     out.writeObject(hangman.getCurrentQuiz().getNumber()); // 글자 수 전송

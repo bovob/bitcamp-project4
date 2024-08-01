@@ -85,7 +85,7 @@ public class ClientApp {
     }
   }
 
-  private void playHangman() {
+  private void playHangman()  {
     try (
         Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
