@@ -87,9 +87,9 @@ public class ClientApp {
 
   private void playHangman() {
     try (
-        Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+            Socket socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
     ) {
       out.writeUTF("hangman");
       out.flush();
@@ -105,8 +105,19 @@ public class ClientApp {
       System.out.println(gameState);
 
       while (true) {
-        System.out.print("글자를 추측하세요: ");
-        char guess = Prompt.input("").toLowerCase().charAt(0);
+        char guess;
+        while (true) {
+          System.out.print("글자를 추측하세요: ");
+          String input = Prompt.input("").trim().toLowerCase();
+
+          if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
+            guess = input.charAt(0);
+            break;
+          } else {
+            System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
+          }
+        }
+
         out.writeChar(guess);
         out.flush();
 
@@ -135,4 +146,5 @@ public class ClientApp {
       System.out.println("게임 진행 중 오류 발생: " + e.getMessage());
     }
   }
+
 }

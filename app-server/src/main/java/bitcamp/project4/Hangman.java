@@ -45,19 +45,22 @@ public class Hangman {
         }
 
         guess = Character.toLowerCase(guess);
-        if (guessedLetters.contains(guess)) {
-            return false;
-        }
+        boolean alreadyGuessed = guessedLetters.contains(guess);
 
         guessedLetters.add(guess);
+
         if (currentQuiz.getAnswer().toLowerCase().indexOf(guess) == -1) {
-            turnsLeft--;
-            wrongGuesses++;
+            if (!alreadyGuessed) {
+                // 첫 추측이라면 틀린 경우에만 턴 수를 줄인다.
+                wrongGuesses++;
+            }
+            turnsLeft--; // 이미 틀린 단어를 중복 입력해도 턴 수를 깎는다.
             return false;
         } else {
             return true;
         }
     }
+
 
     public String getDisplayWord() {
         StringBuilder display = new StringBuilder();
