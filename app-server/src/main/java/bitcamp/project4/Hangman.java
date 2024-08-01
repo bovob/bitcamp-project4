@@ -6,7 +6,7 @@ import bitcamp.project4.myapp.vo.Quiz;
 import java.util.*;
 
 public class Hangman {
-    private static final int MAX_TRIES = 6;
+    private static int MAX_TRIES;
     private ListQuizDao quizDao;
     private Quiz currentQuiz;
     private Set<Character> guessedLetters;
@@ -32,8 +32,10 @@ public class Hangman {
             System.out.println("퀴즈를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
             System.exit(1);
         }
+
         guessedLetters.clear();
-        turnsLeft = MAX_TRIES;
+        MAX_TRIES = currentQuiz.getAnswer().length();
+        turnsLeft = MAX_TRIES + 4;
         topic = currentQuiz.getTopic();
         hint = currentQuiz.getHint();
         wrongGuesses = 0;
