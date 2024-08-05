@@ -140,7 +140,7 @@ public class ClientApp {
               System.out.println("                          ………………....... ");
               System.out.println("                       ……       ✨           …");
               System.out.println("                  …    ✨                ✨     ….");
-              System.out.println("             ……              𝐜𝐨𝐧𝐠𝐫𝐚𝐭ulation             ……");
+              System.out.println("             ……              𝐜𝐨𝐧𝐠𝐫𝐚𝐭𝐳             ……");
               System.out.println("        ………            👏    🎉   👍           ………");
               System.out.println("             ……✨          ◝(ᵔᵕᵔ)◜     ✨   ……");
               System.out.println("                  ……                             …….");
