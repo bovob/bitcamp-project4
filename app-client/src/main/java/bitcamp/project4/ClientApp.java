@@ -8,7 +8,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ClientApp {
 
@@ -17,6 +19,11 @@ public class ClientApp {
   private Socket socket;
   private ObjectOutputStream out;
   private ObjectInputStream in;
+  private Set<Character> guessedLetters;
+
+  public ClientApp() {
+    this.guessedLetters = new HashSet<>();
+  }
 
   public static void main(String[] args) {
     ClientApp app = new ClientApp();
@@ -108,6 +115,8 @@ public class ClientApp {
     System.out.println("단어 길이: " + wordLength);
     System.out.println(gameState);
 
+    StringBuilder state = new StringBuilder();
+
     while (true) {
       char guess;
       while (true) {
@@ -116,6 +125,15 @@ public class ClientApp {
 
         if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
           guess = input.charAt(0);
+
+
+          if (guessedLetters.contains(guess)) {
+            System.out.println("이전에 입력한 글자입니다. 다른 글자를 입력해주세요.");
+            continue;
+          }
+          guessedLetters.add(guess);
+
+
           break;
         } else {
           System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
@@ -136,7 +154,7 @@ public class ClientApp {
       if (gameOver) {
         String answer = (String) in.readObject();
         boolean win = in.readBoolean();
-
+        guessedLetters.clear();
         if (win) {
           System.out.println("축하합니다! 정답을 맞추셨습니다.");
         } else {
