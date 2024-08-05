@@ -56,9 +56,9 @@ public class ClientApp {
 
       while (true) {
         System.out.println("---------------------------------");
-        System.out.println("Hang Man Game 🎮");
+        System.out.println("Hang Man Game ◉o◉)⊃━🎮");
         System.out.println("---------------------------------");
-        String command = Prompt.input("1)게임시작 2)종료 > ");
+        String command = Prompt.input("1) 게임 시작 2) 종료 > ");
         if (command.equals("1")) {
           connectToServer();
           playHangman();
@@ -136,9 +136,36 @@ public class ClientApp {
             String answer = (String) in.readObject();
             boolean win = in.readBoolean();
             if (win) {
+              System.out.println("                               ……….");
+              System.out.println("                          ………………....... ");
+              System.out.println("                       ……       ✨           …");
+              System.out.println("                  …    ✨                ✨     ….");
+              System.out.println("             ……              𝐜𝐨𝐧𝐠𝐫𝐚𝐭ulation             ……");
+              System.out.println("        ………            👏    🎉   👍           ………");
+              System.out.println("             ……✨          ◝(ᵔᵕᵔ)◜     ✨   ……");
+              System.out.println("                  ……                             …….");
+              System.out.println("                       ……        ✨        …. ");
+              System.out.println("                             …………….... ");
+              System.out.println("                                  …….");
+
+              System.out.println("----------------------------------");
               System.out.println("축하합니다! 정답을 맞추셨습니다.");
+              System.out.println("----------------------------------");
             } else {
-              System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
+              System.out.println("   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀");
+              System.out.println("    ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⣶⡆⠀⣰⣿⠇⣾⡿⠛⠉⠁");
+              System.out.println("  ⠀⣠⣴⠾⠿⠿⠀⢀⣾⣿⣆⣀⣸⣿⣷⣾⣿⡿⢸⣿⠟⢓⠀⠀");
+              System.out.println("  ⣴⡟⠁⣀⣠⣤⠀⣼⣿⠾⣿⣻⣿⠃⠙⢫⣿⠃⣿⡿⠟⠛⠁⠀");
+              System.out.println("  ⢿⣝⣻⣿⡿⠋⠾⠟⠁⠀⠹⠟⠛⠀⠀⠈⠉⠀⠉⠀⠀⠀⠀⠀");
+              System.out.println("  ⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⣀⢀⣠⣤⣴⣤⣄⠀");
+              System.out.println("  ⠀⠀⠀⠀⣀⣤⣤⢶⣤⠀⠀⢀⣴⢃⣿⠟⠋⢹⣿⣣⣴⡿⠋⠀");
+              System.out.println("  ⠀⠀⣰⣾⠟⠉⣿⡜⣿⡆⣴⡿⠁⣼⡿⠛⢃⣾⡿⠋⢻⣇⠀⠀");
+              System.out.println("  ⠀⠐⣿⡁⢀⣠⣿⡇⢹⣿⡿⠁⢠⣿⠷⠟⠻⠟⠀⠀⠈⠛⠀⠀");
+              System.out.println("  ⠀⠀⠙⠻⠿⠟⠋⠀⠀⠙⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
+
+              System.out.println("----------------------------------");
+              System.out.println("아쉽네요. 다음에 다시 도전해보세요!");
+              System.out.println("----------------------------------");
             }
             System.out.println("정답은 '" + answer + "' 였습니다.");
             break;
