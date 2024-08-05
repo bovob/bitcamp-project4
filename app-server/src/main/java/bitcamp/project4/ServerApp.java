@@ -39,9 +39,6 @@ public class ServerApp {
   }
 
   void execute() {
-    String remoteHost = null;
-    int port = 0;
-
     // 애플리케이션이 시작될 때 리스너에게 알린다.
     for (ApplicationListener listener : listeners) {
       try {
@@ -55,6 +52,9 @@ public class ServerApp {
     quizDaoSkel = (QuizDaoSkel) appCtx.getAttribute("quizDaoSkel");
 
     System.out.println("서버 프로젝트 관리 시스템 시작!");
+
+    String remoteHost = null;
+    int port = 0;
 
     try (ServerSocket serverSocket = new ServerSocket(8888);) {
       System.out.println("서버 실행 중...");
@@ -100,8 +100,7 @@ public class ServerApp {
       remoteHost = addr.getHostString();
       port = addr.getPort();
 
-
-
+      //System.out.printf("%s:%d 클라이언트와 연결되었음!\n", remoteHost, port);
       ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
       ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 

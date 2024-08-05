@@ -27,7 +27,6 @@ public class ClientApp {
 
   public static void main(String[] args) {
     ClientApp app = new ClientApp();
-    // 애플리케이션이 시작되거나 종료될 때 알림 받을 객체의 연락처를 등록한다.
     app.addApplicationListener(new InitApplicationListener());
     app.execute();
   }
@@ -36,23 +35,12 @@ public class ClientApp {
     listeners.add(listener);
   }
 
-  private void removeApplicationListener(ApplicationListener listener) {
-    listeners.remove(listener);
-  }
-
   void execute() {
-
     try {
       System.out.println("Default [ localhost / 8888 ]");
       appCtx.setAttribute("host", Prompt.input("서버 주소?"));
       appCtx.setAttribute("port", Prompt.inputInt("포트 번호?"));
-      // 클라이언트 소켓 생성
-      socket = new Socket((String) appCtx.getAttribute("host"), (int) appCtx.getAttribute("port"));
 
-      out = new ObjectOutputStream(socket.getOutputStream());
-      in = new ObjectInputStream(socket.getInputStream());
-
-      // 애플리케이션이 시작될 때 리스너에게 알린다.
       for (ApplicationListener listener : listeners) {
         try {
           listener.onStart(appCtx);
@@ -61,20 +49,19 @@ public class ClientApp {
         }
       }
 
-      // 게임 시작 메뉴 전에 환영 메시지 출력
       System.out.println("---------------------------------");
       System.out.println("[Welcome to Hang Man Game! \uD83C\uDFAE]");
       System.out.println("---------------------------------");
 
       while (true) {
-        // 매 턴 시작 시 타이틀과 구분선을 출력
         System.out.println("---------------------------------");
         System.out.println("Hang Man Game 🎮");
         System.out.println("---------------------------------");
         String command = Prompt.input("1)게임시작 2)종료 > ");
         if (command.equals("1")) {
+          connectToServer();
           playHangman();
-
+          closeConnection();
         } else if (command.equals("2")) {
           break;
         }
@@ -88,10 +75,8 @@ public class ClientApp {
     }
 
     System.out.println("종료합니다.");
-
     Prompt.close();
 
-    // 애플리케이션이 종료될 때 리스너에게 알린다.
     for (ApplicationListener listener : listeners) {
       try {
         listener.onShutdown(appCtx);
@@ -101,7 +86,20 @@ public class ClientApp {
     }
   }
 
+  private void connectToServer() throws Exception {
+    String host = (String) appCtx.getAttribute("host");
+    int port = (int) appCtx.getAttribute("port");
+    socket = new Socket(host, port);
+    out = new ObjectOutputStream(socket.getOutputStream());
+    in = new ObjectInputStream(socket.getInputStream());
+  }
+
   private void playHangman() throws Exception {
+    if (!isConnected()) {
+      System.out.println("서버와 연결되어 있지 않습니다. 다시 연결을 시도합니다.");
+      connectToServer();
+    }
+
     out.writeUTF("hangman");
     out.flush();
 
@@ -115,7 +113,7 @@ public class ClientApp {
     System.out.println("단어 길이: " + wordLength);
     System.out.println(gameState);
 
-    StringBuilder state = new StringBuilder();
+    guessedLetters.clear();
 
     while (true) {
       char guess;
@@ -126,14 +124,11 @@ public class ClientApp {
         if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
           guess = input.charAt(0);
 
-
           if (guessedLetters.contains(guess)) {
             System.out.println("이전에 입력한 글자입니다. 다른 글자를 입력해주세요.");
             continue;
           }
           guessedLetters.add(guess);
-
-
           break;
         } else {
           System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
@@ -154,7 +149,6 @@ public class ClientApp {
       if (gameOver) {
         String answer = (String) in.readObject();
         boolean win = in.readBoolean();
-        guessedLetters.clear();
         if (win) {
           System.out.println("축하합니다! 정답을 맞추셨습니다.");
         } else {
@@ -166,6 +160,10 @@ public class ClientApp {
     }
   }
 
+  private boolean isConnected() {
+    return socket != null && socket.isConnected() && !socket.isClosed();
+  }
+
   private void closeConnection() {
     try {
       if (in != null) in.close();
@@ -173,6 +171,10 @@ public class ClientApp {
       if (socket != null) socket.close();
     } catch (Exception e) {
       System.out.println("연결 종료 중 오류 발생: " + e.getMessage());
+    } finally {
+      in = null;
+      out = null;
+      socket = null;
     }
   }
 }
