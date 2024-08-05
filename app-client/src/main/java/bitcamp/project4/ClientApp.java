@@ -4,6 +4,7 @@ import bitcamp.project4.context.ApplicationContext;
 import bitcamp.project4.listener.ApplicationListener;
 import bitcamp.project4.listener.InitApplicationListener;
 import bitcamp.project4.util.Prompt;
+import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -95,68 +96,61 @@ public class ClientApp {
   }
 
   private void playHangman() throws Exception {
-    if (!isConnected()) {
-      System.out.println("서버와 연결되어 있지 않습니다. 다시 연결을 시도합니다.");
-      connectToServer();
-    }
-
-    out.writeUTF("hangman");
-    out.flush();
-
-    int wordLength = (int) in.readObject();
-    int turnsLeft = in.readInt();
-    String topic = (String) in.readObject();
-    String gameState = (String) in.readObject();
-
-    System.out.println("행맨 게임을 시작합니다!");
-    System.out.println("주제: " + topic);
-    System.out.println("단어 길이: " + wordLength);
-    System.out.println(gameState);
-
-    guessedLetters.clear();
-
-    while (true) {
-      char guess;
-      while (true) {
-        System.out.print("글자를 추측하세요: ");
-        String input = Prompt.input("").trim().toLowerCase();
-
-        if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
-          guess = input.charAt(0);
-
-          if (guessedLetters.contains(guess)) {
-            System.out.println("이전에 입력한 글자입니다. 다른 글자를 입력해주세요.");
-            continue;
-          }
-          guessedLetters.add(guess);
-          break;
-        } else {
-          System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
-        }
+    try {
+      if (!isConnected()) {
+        System.out.println("서버와 연결되어 있지 않습니다. 다시 연결을 시도합니다.");
+        connectToServer();
       }
 
-      out.writeChar(guess);
+      out.writeUTF("hangman");
       out.flush();
 
-      boolean correctGuess = in.readBoolean();
-      turnsLeft = in.readInt();
-      String currentWord = (String) in.readObject();
-      boolean gameOver = in.readBoolean();
-      gameState = (String) in.readObject();
+      int wordLength = (int) in.readObject();
+      int turnsLeft = in.readInt();
+      String topic = (String) in.readObject();
+      String gameState = (String) in.readObject();
 
+      System.out.println("행맨 게임을 시작합니다!");
+      System.out.println("주제: " + topic);
+      System.out.println("단어 길이: " + wordLength);
       System.out.println(gameState);
 
-      if (gameOver) {
-        String answer = (String) in.readObject();
-        boolean win = in.readBoolean();
-        if (win) {
-          System.out.println("축하합니다! 정답을 맞추셨습니다.");
-        } else {
-          System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
+      guessedLetters.clear();
+
+      while (true) {
+        char guess = getGuessFromUser();
+
+        out.writeChar(guess);
+        out.flush();
+
+        try {
+          boolean correctGuess = in.readBoolean();
+          turnsLeft = in.readInt();
+          String currentWord = (String) in.readObject();
+          boolean gameOver = in.readBoolean();
+          gameState = (String) in.readObject();
+
+          System.out.println(gameState);
+
+          if (gameOver) {
+            String answer = (String) in.readObject();
+            boolean win = in.readBoolean();
+            if (win) {
+              System.out.println("축하합니다! 정답을 맞추셨습니다.");
+            } else {
+              System.out.println("아쉽네요. 다음에 다시 도전해보세요.");
+            }
+            System.out.println("정답은 '" + answer + "' 였습니다.");
+            break;
+          }
+        } catch (EOFException e) {
+          System.out.println("서버와의 연결이 끊어졌습니다. 게임을 종료합니다.");
+          break;
         }
-        System.out.println("정답은 '" + answer + "' 였습니다.");
-        break;
       }
+    } catch (Exception e) {
+      System.out.println("게임 진행 중 오류가 발생했습니다: " + e.getMessage());
+      closeConnection();
     }
   }
 
@@ -175,6 +169,26 @@ public class ClientApp {
       in = null;
       out = null;
       socket = null;
+    }
+  }
+
+  private char getGuessFromUser() {
+    while (true) {
+      System.out.print("글자를 추측하세요: ");
+      String input = Prompt.input("").trim().toLowerCase();
+
+      if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
+        char guess = input.charAt(0);
+
+        if (guessedLetters.contains(guess)) {
+          System.out.println("이전에 입력한 글자입니다. 다른 글자를 입력해주세요.");
+          continue;
+        }
+        guessedLetters.add(guess);
+        return guess;
+      } else {
+        System.out.println("잘못된 입력입니다. 알파벳 하나만 입력해주세요.");
+      }
     }
   }
 }
