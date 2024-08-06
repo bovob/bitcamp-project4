@@ -6,11 +6,11 @@
   <br>
 
   |    IP     | Port |     비고      |
-      |:---------:|:----:|:-----------:|
+  |:---------:|:----:|:-----------:|
   | localhost | 8888 |    local    |
   | 127.0.0.1 | 8888 | LoopBack IP |
 
-<br>
+  <br>
 
 ## 1. 프로젝트 소개
 
@@ -130,12 +130,14 @@
 - HangMan 게임을 시작하기 위한 Server
 - ThreadPool 을 이용하여 여러명의 Client 가 이용할 수 있다.
 - Client의 접속과 종료를 출력한다.
+![server](https://github.com/user-attachments/assets/0b90977c-60fa-45a0-af3f-d047b70b5bac)
 
 
 
 ### 2. Client
 - Server의 IP와 Port 를 받아 HangMan 게임에 접속한다.
 - 게임시작을 통하여 게임이 진행된다.
+![client_login](https://github.com/user-attachments/assets/74ba9ee6-24b0-4a94-8a9c-f11c0a3860dc)
 
 
 
@@ -147,6 +149,8 @@
   3) 일정 횟수 이상 틀릴 시 Hint 제공
 - 단어 추론에 성공할 시 승리
 - 단어 추론에 실패할 시 패배
+![client_success](https://github.com/user-attachments/assets/60215dc2-e455-4c05-9f72-b6fcb5ee46f8)
+![client_fail](https://github.com/user-attachments/assets/2c5bc2c0-7707-4489-9e78-0ec841f02187)
 
 <br>
 
