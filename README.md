@@ -149,6 +149,9 @@
   3) 일정 횟수 이상 틀릴 시 Hint 제공
 - 단어 추론에 성공할 시 승리
 - 단어 추론에 실패할 시 패배
+  
+<br>
+
 ![client_success](https://github.com/user-attachments/assets/60215dc2-e455-4c05-9f72-b6fcb5ee46f8)
 ![client_fail](https://github.com/user-attachments/assets/2c5bc2c0-7707-4489-9e78-0ec841f02187)
 
