@@ -148,6 +148,7 @@ public class ClientApp {
               System.out.println("                             …………….... ");
               System.out.println("                                  …….");
 
+
               System.out.println("----------------------------------");
               System.out.println("축하합니다! 정답을 맞추셨습니다.");
               System.out.println("----------------------------------");
